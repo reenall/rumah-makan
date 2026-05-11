@@ -4,6 +4,8 @@
   --font-display: var(--font-bodoni-moda);
   --color-primary: #eab308;
   --color-secondary: #cbd5e1;
+  /* --color-bgPrimary: #07183d; */
+  --color-bgPrimary: black;
 }
 
 

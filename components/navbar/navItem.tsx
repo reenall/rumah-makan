@@ -15,7 +15,7 @@ function NavItem(props: NavItemProps) {
     <Link 
       href={url} 
       // className={`px-5 py-1 ${border ? 'border-2 border-primary' : ''}`}>
-      className={`px-5 py-1 ${border ? 'border-2 border-primary' : ''}`}>
+      className={`px-5 py-1 ${border ? 'border-3 border-primary' : ''}`}>
         <p className="font-medium text-sm text-gray-200">{title}</p>
     </Link>
   )
