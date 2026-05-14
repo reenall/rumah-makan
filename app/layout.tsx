@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway, Cormorant_Infant } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
+import Navbar from "@/components/fragments/navbar";
 
 const raleway = Raleway({
   variable: "--font-raleway",
@@ -27,7 +27,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${raleway.variable} ${bodoniModa.variable} antialiased`}
+        className={`${raleway.variable} ${bodoniModa.variable} antialiased bg-bgPrimary`}
       >
         <Navbar />
         <main className="min-h-screen">
