@@ -8,6 +8,10 @@
   --color-bgPrimary: black;
 }
 
+*{
+  box-sizing: border-box;
+}
+
 
 .___black {
   @apply border-2 border-black

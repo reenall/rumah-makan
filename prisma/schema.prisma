@@ -1,0 +1,188 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// -------------------------- ENUM --------------------------
+
+enum ProductStatus {
+  // atribut di ts     @map ("value di db") alias naming
+  AVAILABLE     @map("available")
+  NOT_AVAILABLE @map("not_available")
+}
+
+enum CategoryName {
+  FOOD    @map("food")
+  DRINKS  @map("drinks")
+  DESSERT @map("dessert")
+}
+
+enum OrderStatus {
+  PENDING   @map("pending")
+  CONFIRMED @map("confirmed")
+  CANCELLED @map("cancelled")
+  COMPLETED @map("completed")
+}
+
+enum ReservationStatus {
+  PENDING   @map("pending")
+  CONFIRMED @map("confirmed")
+  CANCELLED @map("cancelled")
+  COMPLETED @map("completed")
+  NO_SHOW   @map("no_show")
+}
+
+enum PaymentMethod {
+  CASH          @map("cash")
+  QRIS          @map("qris")
+  BANK_TRANSFER @map("bank_transfer")
+}
+
+enum PaymentStatus {
+  PENDING            @map("pending")
+  PROCESSING         @map("processing")
+  PAID               @map("paid")
+  FAILED             @map("failed")
+  CANCELLED          @map("cancelled")
+  EXPIRED            @map("expired")
+  REFUNDED           @map("refunded")
+  PARTIALLY_REFUNDED @map("partially_refunded")
+}
+
+enum UserRole {
+  ADMIN       @map("admin")
+  SUPER_ADMIN @map("super_admin")
+  USER        @map("user")
+}
+
+// -------------------------- MODEL --------------------------
+
+model Product {
+  id          String        @id @default(cuid())
+  name        String
+  price       Int
+  image       String
+  description String
+  status      ProductStatus @default(AVAILABLE)
+  createdAt   DateTime      @default(now()) @map("created_at")
+  updatedAt   DateTime      @updatedAt @map("updated_at")
+
+  category   Category[]
+  orderItems OrderItem[]
+
+  @@map("products")
+}
+
+model Category {
+  id       String       @id @default(cuid())
+  name     CategoryName @unique
+  products Product[]
+
+  @@map("categories")
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String @map("order_id")
+  productId String @map("product_id")
+  quantity  Int
+  price     Int
+
+  order   Order   @relation(fields: [orderId], references: [id], onDelete: Cascade)
+  product Product @relation(fields: [productId], references: [id])
+
+  @@map("order_items")
+}
+
+model Order {
+  id          String      @id @default(cuid())
+  customerId  String      @map("customer_id")
+  items       OrderItem[]
+  status      OrderStatus @default(PENDING)
+  totalAmount Int         @map("total_amount")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  payment     Payment?
+  reservation Reservation?
+
+  customer User @relation(fields: [customerId], references: [id])
+
+  @@map("orders")
+}
+
+model Reservation {
+  id          String            @id @default(cuid())
+  orderId     String?           @unique @map("order_id")
+  guestCount  Int               @map("guest_count")
+  status      ReservationStatus @default(PENDING)
+  scheduledAt DateTime          @map("scheduled_at")
+  notes       String?
+  createdAt   DateTime          @default(now()) @map("created_at")
+  updatedAt   DateTime          @updatedAt @map("updated_at")
+
+  order Order? @relation(fields: [orderId], references: [id])
+
+  @@map("reservations")
+}
+
+model Payment {
+  id             String         @id @default(cuid())
+  orderId        String         @unique @map("order_id")
+  method         PaymentMethod?
+  amount         Int
+  refundedAmount Int?           @map("refunded_amount")
+  status         PaymentStatus  @default(PENDING)
+  paidAt         DateTime?      @map("paid_at")
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+
+  order Order @relation(fields: [orderId], references: [id])
+
+  @@map("payments")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime? @map("email_verified")
+  image         String?
+  accounts      Account[]
+  role          UserRole  @default(USER)
+  phone         String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  orders Order[]
+
+  @@map("users")
+}
+
+// db.Text = ubah type string (defaultnya varchar(191)) jadi Text
+model Account {
+  userId            String  @map("user_id")
+  type              String
+  provider          String
+  providerAccountId String  @map("provider_account_id")
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@id([provider, providerAccountId])
+  @@map("accounts")
+}
