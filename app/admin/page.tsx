@@ -1,9 +1,9 @@
 import React from 'react'
 
-function AdminPage() {
+function AdminDashboardPage() {
   return (
-    <div className='text-white'>AdminPage</div>
+    <div>AdminDashboardPage</div>
   )
 }
 
-export default AdminPage
+export default AdminDashboardPage

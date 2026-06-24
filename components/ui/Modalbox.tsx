@@ -35,7 +35,7 @@ export default function ModalBox(props: ModalProps){
 
    return (
       <div className="fixed top-0 left0 z-50 w-screen h-screen bg-black/50 flex justify-center items-center">
-         <div ref={ref} className="w-max max-h-[80vh] overflow-x-auto bg-black px-10 py-9">
+         <div ref={ref} className="w-max max-h-[80vh] px-10 py-9 overflow-y-auto scrollbar-track-transparent scrollbar-thumb-zinc-900 scrollbar-thin bg-bgPrimary">
             {children}
          </div>
       </div>

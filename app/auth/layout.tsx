@@ -20,14 +20,15 @@ export default function AuthLayout({children}: {children: React.ReactNode}) {
             </div>
          </div>
 
-         <div className="absolute z-20 top-10 left-1/2 -translate-x-1/2 border-2 border-dashed border-primary px-3 py-1">
-            <Link href={'/'}>
-               <p className='flex items-center gap-1 text-sm text-secondary'>
-                  <RiArrowLeftLongFill />
-                  Back to Home
-               </p>
-            </Link>
-         </div>
+         <Link
+            href={'/'} 
+            className="absolute z-20 top-10 left-1/2 -translate-x-1/2 border-2 border-dashed border-primary px-3 py-1 hover:opacity-75"
+         >
+            <p className='flex items-center gap-1 text-sm text-secondary'>
+               <RiArrowLeftLongFill />
+               Back to Home
+            </p>
+         </Link>
       </>
    )
 }

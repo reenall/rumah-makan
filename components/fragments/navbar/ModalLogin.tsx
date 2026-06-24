@@ -7,22 +7,20 @@ import { AiOutlineUser } from "react-icons/ai";
 import { LuLock } from "react-icons/lu";
 import { LoginAction } from '@/actions/LoginAction';
 import { signIn } from 'next-auth/react';
-import { useSearchParams } from 'next/navigation';
 import Input from '@/components/ui/Input';
 
-function LoginPage() {
-   const callbackUrl = useSearchParams()?.get('callbackUrl')
+function ModalLogin({goToRegister}: {goToRegister: () => void}) {
    const [state, formAction, isLoading] = useActionState(LoginAction, null)
 
   return (
-    <div className='text-white w-full h-full'>
+   <div className='text-white min-w-100 w-full h-full'>
       <h2 className='text-center text-6xl font-display font-medium text-primary'>
-        Login
+      Login
       </h2>
       
       <div className='mt-10'>
          <button 
-            onClick={() => signIn('google', { callbackUrl: callbackUrl ?? '/' })}
+            onClick={() => signIn('google')}
             className='w-full py-2 px-3  text-primary bg-transparent border border-transparent border-dashed hover:border-primary hover:opacity-75 cursor-pointer'
          >
             <p className='flex items-center justify-center gap-2 text-sm'>
@@ -37,7 +35,7 @@ function LoginPage() {
             <div className='w-full h-px bg-zinc-700 rounded-full' />
          </div>
 
-         {state?.success === false && state?.message ? (
+         {state?.success === false ? (
             <p className='text-sm text-red-500 text-center mb-5'>{state?.message}</p>
          ) : null}
 
@@ -45,23 +43,28 @@ function LoginPage() {
             className='flex flex-col gap-3'
             action={formAction}
          >
-            <input type="hidden" name="callbackUrl" value={callbackUrl ?? '/'} />
             <Input name="email" type="email" placeholder="E-mail" icon={<AiOutlineUser />} defaultValue={state?.currentFieldsData?.email} error={state?.errors?.email?.[0]} />
             <Input name="password" type="password" placeholder='Password' icon={<LuLock />} error={state?.errors?.password?.[0]} />
-            <button type='submit' disabled={isLoading} className={`mt-8 px-5 py-2 bg-primary text-black text-sm font-semibold cursor-pointer hover:opacity-75 ${isLoading ? 'opacity-75' : ''}`}>{isLoading ? 'Loading...' : 'Login'}</button>
+            <button 
+               type='submit' 
+               disabled={isLoading} 
+               className={`mt-8 px-5 py-2 bg-primary text-black text-sm font-semibold cursor-pointer hover:opacity-75 ${isLoading ? 'opacity-75' : ''}`}
+            >
+               {isLoading ? 'Loading...' : 'Login'}
+            </button>
          </form>
 
-         <Link
-            href={callbackUrl ? `/auth/register?callbackUrl=${callbackUrl}` : '/auth/register'}
-            className='block mt-10'
+         <button
+            onClick={goToRegister}
+            className='block mt-10 w-max mx-auto cursor-pointer'
          >
             <p className='text-xs text-center text-secondary'>
                {`Don't have an account? Register here`}
             </p>
-         </Link>
+         </button>
       </div>
-    </div>
+   </div>
   )
 }
 
-export default LoginPage
+export default ModalLogin

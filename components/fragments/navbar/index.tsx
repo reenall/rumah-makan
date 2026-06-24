@@ -4,19 +4,20 @@ import Image from "next/image";
 import NavItem from "./navItem";
 import ModalBox from "@/components/ui/Modalbox";
 import { useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 import { usePathname } from "next/navigation";
+import ModalLogin from "./ModalLogin";
+import ModalRegister from "./ModalRegister";
+import { IoExitOutline } from "react-icons/io5";
+import { MdEngineering } from "react-icons/md";
+import Link from "next/link";
+import { navList } from "@/data/navList";
 
 export default function Navbar(){
    const [modalOpen, SetModalOpen] = useState('')
    const {data} = useSession()
-   const disableNavbar = ['auth']
+   const disableNavbar = ['auth', 'admin']
    const pathname = usePathname().split('/')[1]
-
-   const navList: {title: string, url: string, border?: boolean}[] = [
-      {title: "Home", url: '/'},
-      {title: "Daftar Menu", url: '/daftar-menu'},
-   ]
 
    return (
       <>
@@ -28,10 +29,10 @@ export default function Navbar(){
                <Image src={'/img/brand.png'} alt="Logo" width={100} height={50} className="invert" />
             </div>
 
-            <div className="flex">
+            <div className="flex items-center">
                <div className="flex gap-2">
                   {navList.map((item, index) => (
-                     <NavItem type="url" key={index} title={item.title} url={item.url} border={item.border} />
+                     <NavItem type="url" key={index} title={item.title} url={item.url} />
                   ))}
                   
                   <NavItem type="button" title="Contact" border onClick={() => {SetModalOpen('contact')}} />
@@ -39,17 +40,32 @@ export default function Navbar(){
 
                {data?.user 
                   ? (
-                     <button onClick={() => signOut()} className="text-secondary bg-red-700">Signout</button>
+                     <button 
+                        className="ml-5 cursor-pointer"
+                        onClick={() => {signOut()}}
+                     >
+                        <IoExitOutline className="text-secondary size-5" />
+                     </button>
                   ) :
                   (
                      <button 
-                        className="ml-5 cursor-pointer"
+                        className="ml-5 cursor-pointer"  
                         onClick={() => {SetModalOpen('login')}}
-                        // onClick={() => signIn("google")}
                      >
                         <svg className="text-secondary size-5" aria-hidden="true" fill="none" focusable="false" viewBox="0 0 24 24"><path d="M16.125 8.75c-.184 2.478-2.063 4.5-4.125 4.5s-3.944-2.021-4.125-4.5c-.187-2.578 1.64-4.5 4.125-4.5 2.484 0 4.313 1.969 4.125 4.5Z" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"></path><path d="M3.017 20.747C3.783 16.5 7.922 14.25 12 14.25s8.217 2.25 8.984 6.497" stroke="currentColor" strokeWidth="2.2" strokeMiterlimit="10"></path></svg>
                      </button>
                   )
+               }
+
+               {data?.user.role === 'ADMIN' || data?.user.role === 'SUPER-ADMIN'
+                  ? (
+                     <Link
+                        href='/admin' 
+                        className="ml-5 cursor-pointer"
+                     >
+                        <MdEngineering className="text-secondary size-5" />
+                     </Link>
+                  ) : null
                }
 
             </div>
@@ -71,16 +87,12 @@ export default function Navbar(){
 
          {modalOpen === 'login' && (
             <ModalBox onClose={() => SetModalOpen('')}>
-               <div className="flex flex-col gap-5">
-                  <h2 className="text-3xl text-primary font-display font-semibold">Login</h2>
-
-                  <button 
-                     onClick={() => signIn('google')}
-                     className="w-full py-2 px-5 bg-primary cursor-pointer"
-                  >
-                     <p>Login Google</p>
-                  </button>
-               </div>
+               <ModalLogin goToRegister={() => SetModalOpen('register')} />
+            </ModalBox> 
+         )}
+         {modalOpen === 'register' && (
+            <ModalBox onClose={() => SetModalOpen('')}>
+               <ModalRegister goToLogin={() => SetModalOpen('login')} />
             </ModalBox> 
          )}
       </>
